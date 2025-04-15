@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="NetworkService.Views.MeasurementGraphView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkService.Views"
+             xmlns:viewModel="clr-namespace:NetworkService.ViewModel"
+             xmlns:fa5="http://schemas.fontawesome.com/icons/"
+             xmlns:notifications="clr-namespace:Notification.Wpf.Controls;assembly=Notification.Wpf"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" 
+             Height="730" Width="1220">
+    <UserControl.DataContext>
+        <viewModel:MeasurementGraphViewModel />
+    </UserControl.DataContext>
+    <Grid Background="LightSteelBlue">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="600" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Background="LightSteelBlue" BorderBrush="LightSteelBlue"  BorderThickness="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="865" Height="550" Margin="10,80,0,0" Grid.RowSpan="2">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Entity:" FontFamily="Times New Roman" FontSize="20" Width="71" VerticalAlignment="Center" Height="52"/>
+                    <ComboBox x:Name="comboBoxEntityType"  FontFamily="Times New Roman" FontSize="20" ItemsSource="{Binding ComboBoxItems}" SelectedItem="{Binding SelectedType}" Width="200"/>
+                    <Button x:Name="buttonShow" BorderBrush="Black" Cursor="Hand" Background="CornflowerBlue" Content="Show" FontFamily="Times New Roman" FontSize="20" Width="191" Margin="10,0,0,0" Command="{Binding ShowEntitiesCommand}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Width="150" TextAlignment="Center" HorizontalAlignment="Right" Margin="130,3,0,0"/>
+
+                <Canvas Background="White" Width="580" Height="419" HorizontalAlignment="Center" Margin="0,5,100,0">
+                    <!-- Column1 -->
+                    <Grid Name="Column1" Background="LightGray" Width="130" Height="415" Margin="0,0,0,0">
+                        <Grid Name="ValueRange1" Height="260" VerticalAlignment="Top">
+                            <Grid Name="Element1" Margin="{Binding CircleMarkers[0].CmMargin}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <Ellipse Fill="{Binding CircleMarkers[0].CmColor}" Width="40" Height="40"/>
+                                <TextBlock Text="{Binding CircleMarkers[0].CmValue}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+
+                        <TextBlock Text="{Binding CircleMarkers[0].CmTime}"  FontFamily="Times New Roman" Width="80" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Background="White"/>
+                    </Grid>
+
+                    <!-- Column2 -->
+                    <Grid Name="Column2" Background="LightGray" Width="130" Height="415" Margin="150,0,0,0">
+                        <Grid Name="ValueRange2" Height="260" VerticalAlignment="Top">
+                            <Grid Name="Element2" Margin="{Binding CircleMarkers[1].CmMargin}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <Ellipse Fill="{Binding CircleMarkers[1].CmColor}" Width="40" Height="40"/>
+                                <TextBlock Text="{Binding CircleMarkers[1].CmValue}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+
+                        <TextBlock Text="{Binding CircleMarkers[1].CmTime}" FontFamily="Times New Roman" Width="80" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"  Background="White"/>
+                    </Grid>
+
+                    <!-- Column3 -->
+                    <Grid Name="Column3" Background="LightGray" Width="130" Height="415" Margin="300,0,0,0">
+                        <Grid Name="ValueRange3" Height="260" VerticalAlignment="Top">
+                            <Grid Name="Element3" Margin="{Binding CircleMarkers[2].CmMargin}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <Ellipse Fill="{Binding CircleMarkers[2].CmColor}" Width="40" Height="40"/>
+                                <TextBlock Text="{Binding CircleMarkers[2].CmValue}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+
+                        <TextBlock Text="{Binding CircleMarkers[2].CmTime}" FontFamily="Times New Roman" Width="80" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"  Background="White"/>
+                    </Grid>
+
+                    <!-- Column4 -->
+                    <Grid Name="Column4" Background="LightGray" Width="130" Height="415" Margin="450,0,0,0">
+                        <Grid Name="ValueRange4" Height="260" VerticalAlignment="Top">
+                            <Grid Name="Element4" Margin="{Binding CircleMarkers[3].CmMargin}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <Ellipse Fill="{Binding CircleMarkers[3].CmColor}" Width="40" Height="40"/>
+                                <TextBlock Text="{Binding CircleMarkers[3].CmValue}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+
+                        <TextBlock Text="{Binding CircleMarkers[3].CmTime}"  FontFamily="Times New Roman" Width="80" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"  Background="White"/>
+                    </Grid>
+
+
+                </Canvas>
+            </StackPanel>
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="3" Background="White" Height="200" Width="430"  Margin="640 130 0 0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="2">
+                <!-- First Stage -->
+                <Border Background="{Binding Stage1Color}" Height="196" Width="140" BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="{Binding Stage1Label}" FontFamily="Times New Roman" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                </Border>
+                <!-- Second Stage -->
+                <Border Background="{Binding Stage2Color}" Height="196" Width="140" BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="{Binding Stage2Label}" FontFamily="Times New Roman" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                </Border>
+                <!-- Third Stage -->
+                <Border Background="{Binding Stage3Color}" Height="196" Width="140" BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="{Binding Stage3Label}"  FontFamily="Times New Roman" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

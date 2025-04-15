@@ -1,0 +1,867 @@
+﻿<UserControl x:Class="NetworkService.Views.NetworkDisplayView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkService.Views"
+             xmlns:localMain="clr-namespace:NetworkService"
+             xmlns:viewModel="clr-namespace:NetworkService.ViewModel"
+             xmlns:fa5="http://schemas.fontawesome.com/icons/"
+             xmlns:notifications="clr-namespace:Notification.Wpf.Controls;assembly=Notification.Wpf"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:root="clr-namespace:NetworkService"
+             mc:Ignorable="d" 
+              d:DesignHeight="730" d:DesignWidth="1220">
+    <UserControl.DataContext>
+        <viewModel:NetworkDisplayViewModel />
+    </UserControl.DataContext>
+    <Grid 
+        Margin="0 0 0 0"
+        Background="LightGray" 
+        Height="730"
+        VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <Grid 
+            Background="LightGray">
+            <Grid x:Name="SplitTo2ColumnGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.4*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                
+
+                <TreeView
+                     x:Name="ImagesTreeView"
+                     FontFamily="Times New Roman"
+                     Height="641"
+                     VerticalAlignment="Top"
+                     ToolTip="{Binding TreeViewToolTip}"
+                     ItemsSource="{Binding AllImages}" 
+                    Grid.ColumnSpan="2"
+                    Grid.RowSpan="2"
+                    Margin="861,16,10,0"
+                     >
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding TreeViewMouseLeftButtonUpCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="SelectedItemChanged">
+                            <i:InvokeCommandAction Command="{Binding TreeViewSelectionChangedCommand}"
+                                    CommandParameter="{Binding ElementName=ImagesTreeView}"
+                                    />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <TreeView.Resources>
+
+                        <HierarchicalDataTemplate DataType="{x:Type root:ImagesByType}" ItemsSource="{Binding Images}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontWeight="SemiBold" Text="Images with type: " />
+                                <TextBlock FontWeight="SemiBold" Text="{Binding EntyType}" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+
+                        <DataTemplate DataType="{x:Type root:Image}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image
+                         Width="50"
+                         Margin="0,5,5,5"
+                         Source="{Binding Path}" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding FileName}" />
+                            </StackPanel>
+                        </DataTemplate>
+
+                    </TreeView.Resources>
+                </TreeView>
+
+                <Grid x:Name="CanvasGrid" Grid.Column="0" Grid.RowSpan="2" Background="LightGray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel x:Name="DockPanel1"
+                          Grid.Row="0"
+                          Grid.Column="0"
+                          Background="{Binding PreTextBlockColor1}"
+                          Margin="20,0,20,41">
+
+                        <TextBlock
+                             x:Name="TextBlockCanvas1"
+                             FontSize="12"
+                 
+                             Margin="0,0,0,1"
+                             DockPanel.Dock="Top"
+                             Background="LightGray"
+                             Text="{Binding TextBlockCanvas1Text}"
+             
+                             />
+
+                        <Canvas
+                          x:Name="Canvas1"
+                          AllowDrop="True"
+                          Background="White"
+                          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+
+
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas1"
+                                    />
+                                </i:EventTrigger>
+
+
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas1}">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas1">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+
+                        <Button
+                             Background="CornflowerBlue"
+                              Height="20"
+                              Command="{Binding ClearCommand}"
+                              CommandParameter="Canvas1"
+                              Cursor="Hand"
+                              ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                          Height="15"
+                          Foreground="Black"
+                          Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman"/>
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel2"
+      Background="{Binding PreTextBlockColor2}"
+      Grid.Row="0"
+      Grid.Column="1"
+      Margin="20,0,20,41"
+      >
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             x:Name="TextBlockCanvas2"
+             Text="{Binding TextBlockCanvas2Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas2"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" 
+          Height="100"
+          
+          >
+                            <i:Interaction.Triggers>
+
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas2"
+                                    />
+                                </i:EventTrigger>
+
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas2}">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas2">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+         Command="{Binding ClearCommand}"
+         CommandParameter="Canvas2"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                  Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman"/>
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel3"
+     Background="{Binding PreTextBlockColor3}"
+      Grid.Row="0"
+      Grid.Column="2"
+      Margin="20,0,20,41">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             x:Name="TextBlockCanvas3"
+             Text="{Binding TextBlockCanvas3Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas3"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas3"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas3}">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas3">
+
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                            Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+          CommandParameter="Canvas3"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel4"
+     Background="{Binding PreTextBlockColor4}"
+      Grid.Row="0"
+      Grid.Column="3"
+      Margin="20,0,20,41">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas4Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas4"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas4"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas4}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas4"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+         Command="{Binding ClearCommand}"
+         CommandParameter="Canvas4"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                  Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel5"
+      Background="{Binding PreTextBlockColor5}"
+      Grid.Row="1"
+      Grid.Column="0"
+      Margin="20,20,20,21">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas5Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas5"
+          AllowDrop="True"
+          Background="White"
+           DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas5"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas5}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas5"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+         Command="{Binding ClearCommand}"
+         CommandParameter="Canvas5"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel6"
+      Background="{Binding PreTextBlockColor6}"
+      Grid.Row="1"
+      Grid.Column="1"
+      Margin="20,20,20,21">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas6Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas6"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas6"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas6}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas6"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+         CommandParameter="Canvas6"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman"/>
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel7"
+      Background="{Binding PreTextBlockColor7}"
+      Grid.Row="1"
+      Grid.Column="2"
+      Margin="20,20,20,21">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas7Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas7"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas7"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas7}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas7"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+         Command="{Binding ClearCommand}"
+         CommandParameter="Canvas7"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                  Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel8"
+      Background="{Binding PreTextBlockColor8}"
+      Grid.Row="1"
+      Grid.Column="3"
+      Margin="20,20,20,21">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas8Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas8"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas8"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas8}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas8"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+          CommandParameter="Canvas8"
+          Cursor="Hand"
+         ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel9"
+      Background="{Binding PreTextBlockColor9}"
+      Grid.Row="2"
+      Grid.Column="0"
+      Margin="20,40,20,1">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas9Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas9"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas9"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas9}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas9"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+          CommandParameter="Canvas9"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                  Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel10"
+      Background="{Binding PreTextBlockColor10}"
+      Grid.Row="2"
+      Grid.Column="1"
+      Margin="20,40,20,1">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas10Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas10"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas10"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas10}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas10"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+          CommandParameter="Canvas10"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear"  FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel11"
+      Background="{Binding PreTextBlockColor11}"
+      Grid.Row="2"
+      Grid.Column="2"
+      Margin="20,40,20,1">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas11Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas11"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas11"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas11}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas11"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+          CommandParameter="Canvas11"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <DockPanel x:Name="DockPanel12"
+      Background="{Binding PreTextBlockColor12}"
+      Grid.Row="2"
+      Grid.Column="3"
+      Margin="20,40,20,1">
+
+                        <TextBlock
+             FontSize="12"
+             Margin="0,0,0,1"
+             DockPanel.Dock="Top"
+             Background="LightGray"
+             Text="{Binding TextBlockCanvas12Text}"
+             />
+
+                        <Canvas
+          x:Name="Canvas12"
+          AllowDrop="True"
+          Background="White"
+          DockPanel.Dock="Top" Height="100"
+          >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftButtonUpCommand}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding CanvasSelectionChangedCommand}"
+                                    CommandParameter="Canvas12"
+                                    />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDragOverCommand}"
+                                            CommandParameter="{Binding ElementName=Canvas12}"
+                                            
+                                            />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding CanvasDropCommand}"
+                                            CommandParameter="Canvas12"
+                                            />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                        <Button
+                             Background="CornflowerBlue"
+          Height="20"
+          Command="{Binding ClearCommand}"
+         CommandParameter="Canvas12"
+          Cursor="Hand"
+          ToolTip="{Binding ClearButtonToolTip}">
+                            <StackPanel
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Orientation="Horizontal">
+                                <fa5:SvgAwesome
+                  Height="15"
+                   Foreground="Black"
+                  Icon="Solid_Times" />
+                                <TextBlock Margin="5,0,0,0" Text="Clear" FontFamily="Times New Roman" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
